@@ -5,6 +5,7 @@ from PIL import Image
 import os
 import os.path
 import sys
+from typing import Any, Callable, cast, Dict, List, Optional, Tuple
 
 
 def pil_loader(path):
@@ -18,42 +19,45 @@ class Caltech(VisionDataset):
     def __init__(self, root, split='train', transform=None, target_transform=None):
         super(Caltech, self).__init__(root, transform=transform, target_transform=target_transform)
 
-        self.split = split # This defines the split you are going to use
-                           # (split files are called 'train.txt' and 'test.txt')
-
-        '''
-        - Here you should implement the logic for reading the splits files and accessing elements
-        - If the RAM size allows it, it is faster to store all data in memory
-        - PyTorch Dataset classes use indexes to read elements
-        - You should provide a way for the __getitem__ method to access the image-label pair
-          through the index
-        - Labels should start from 0, so for Caltech you will have lables 0...100 (excluding the background class) 
-        '''
-
+        self.root = root
+        self.split = split 
+    
+        if self.split== "train":
+            im_folder = np.loadtxt('train.txt', dtype=str)
+            
+        if self.split== "test":
+            im_folder = np.loadtxt('test.txt', dtype=str)
+        
+        image=[]
+        l_name=[]
+        
+        for i in range(0, len(im_folder)):
+            y = im_folder[i].split('/')
+            if y[0] != "BACKGROUND_Google":
+                l_name.append(y[0])
+                image.append(y[1])
+            #im_path.append(os.path.join(root, y[0], y[1]))
+            
+        self.l_name = l_name
+        self.image = image
+    
+        #self.im_path = im_path
+    
     def __getitem__(self, index):
-        '''
-        __getitem__ should access an element through its index
-        Args:
-            index (int): Index
-
-        Returns:
-            tuple: (sample, target) where target is class_index of the target class.
-        '''
-
-        image, label = ... # Provide a way to access image and label via index
+        path = os.path.join(self.root, self.label[index], self.image[index])
+        
+        label = self.l_name[index]
+        image = pil_loader(path) # Provide a way to access image and label via index
                            # Image should be a PIL Image
                            # label can be int
 
         # Applies preprocessing when accessing the image
         if self.transform is not None:
             image = self.transform(image)
-
+    
         return image, label
 
     def __len__(self):
-        '''
-        The __len__ method returns the length of the dataset
-        It is mandatory, as this is used by several other components
-        '''
-        length = ... # Provide a way to get the length (number of elements) of the dataset
+
+        length = len(self.image)
         return length
