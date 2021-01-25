@@ -65,7 +65,7 @@ class Caltech(VisionDataset):
             image = self.transform(image)
         label = torch.from_numpy(np.asarray(self.label[index]))
         label = label.long()
-        return image, label
+        return image, label, path, self.target[index]
 
     def __len__(self):
 
