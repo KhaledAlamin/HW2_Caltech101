@@ -8,7 +8,7 @@ import sys
 from typing import Any, Callable, cast, Dict, List, Optional, Tuple
 import re
 import numpy as np
-
+import torch
 
 def pil_loader(path):
     # open path as file to avoid ResourceWarning (https://github.com/python-pillow/Pillow/issues/835)
